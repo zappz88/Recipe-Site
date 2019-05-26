@@ -86,9 +86,6 @@
 
 
         <script>
-
-//            fetch('https://jsonplaceholder.typicode.com/todos/1').then(response=>response.json()).then(json=>console.log(json));
-
             class LocalStore {
                 constructor() {
                     this.collection = window.localStorage;
@@ -337,13 +334,6 @@
                             $('span').removeClass('spinner-border spinner-border-sm');
                             $('#searchBtn').html(html);
                             let recipes = data.hits;
-                            console.log(recipes);
-//                        $('#recipes').html(recipes.map((currentVal) => `<div class='col-sm-10 m-sm-5 p-sm-5 shadow-lg text-center'><h1>${currentVal.recipe.label}</h1>
-//                        <img src='${currentVal.recipe.image}'><br><button class='btn btn-primary m-sm-2'><a href="${currentVal.recipe.url}" class='text-white text-decoration-none'>Recipe</a></button>
-//                        <button type='button' class='btn btn-primary' onclick='bookMark(${currentVal.recipe.url})'>Bookmark</button><div class='row justify-content-around ml-sm-5'><div class='col-sm-5 text-left'>
-//                        <h4>Ingredients</h4><ul>${currentVal.recipe.ingredientLines.map((currentVal) => '<li>' + currentVal + '</li>').join("")}</ul></div>
-//                        <div class='col-sm-5 text-left'><h4>Health Information</h4><ul>${currentVal.recipe.healthLabels.map((currentVal) => '<li>' + currentVal + '</li>').join("")}</ul></div></div>`));
-
                             for (let i = 0; i < recipes.length; i++) {
                                 document.getElementById('recipes').innerHTML += `<div class='col-sm-10 m-sm-5 p-sm-5 shadow-lg text-center'><h1>${recipes[i].recipe.label}</h1>
                             <img src='${recipes[i].recipe.image}'><br><button class='btn btn-primary m-sm-2'><a href="${recipes[i].recipe.url}" class='text-white text-decoration-none'>Recipe</a></button>
