@@ -31,10 +31,10 @@
             <div id="inputs" class="row justify-content-center text-center">
                 <div class="form-inline justify-content-center my-sm-2">
                     <div class="form-group mx-sm-2">
-                        <input type="text" id="userName" placeholder="username" name="userName" required>
+                        <input type="text" id='userName' class='p-sm-1' placeholder='username' name='userName' required>
                     </div>
                     <div class="form-group mx-sm-2">
-                        <input type="password" id="userPassword" placeholder="password" name="userPassword" required>
+                        <input type="password" id='userPassword' class='p-sm-1' placeholder='password' name='userPassword' required>
                     </div>
                 </div>
                 <div class="form-inline justify-content-center my-sm-2">
@@ -42,23 +42,24 @@
                         <input type="checkbox" id="rememberUser" name="rememberUser" value="false">
                         <p class="m-auto">Save Login</p>
                     </div>
-                    <div class="form-group dropdown mx-sm-2">
-                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Menu</button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="/accountPage.php">Account</a>
-                            <a class="dropdown-item" href="#">Bookmarks</a>
-                            <a class="dropdown-item" href="#">About Us</a>
-                        </div>
-                    </div>
                 </div>
             </div>
-            <div class="row justify-content-center text-center my-1">
+            <div class="row justify-content-center text-center my-sm-1">
                 <div class="form-inline justify-content-center">
                     <div class="form-group mx-2">
                         <button type="button" id="loginBtn" class="btn btn-primary">Login</button>
                     </div>
                     <div class="form-group mx-2">
-                        <button type="button" id="registerBtn" class="btn btn-primary">Register</button>
+                        <button type="button" id="registerBtn" class="btn btn-primary"><a href="http://localhost/FoodBug/registrationPage.php" class="text-decoration-none text-white">Register</a></button>
+                    </div>
+                    <div class="dropdown">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">Menu</button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item active" href="index.php">Home</a>
+                            <a class="dropdown-item" href="accountPage.php">Account</a>
+                            <a class="dropdown-item" href="#">Bookmarks</a>
+                            <a class="dropdown-item" href="#">About Us</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -237,29 +238,28 @@
 ////////////////////////////////////////////////////////////////////////////////
 
             $(window).bind('load', function () {
+                if (session.get('status') === 'true' || local.get('status') === 'true') {
 
-                local.set('status', false);
-                session.set('status', false);
+                    if (session.get('userName') !== null || local.get('userName') !== null) {
+                        if (local.get('userName') !== null) {
+                            $('#userName').val(local.get('userName'));
+                        } else {
+                            $('#userName').val(session.get('userName'));
+                        }
+                    }
 
-                if (session.get('userName') !== null || local.get('userName') !== null) {
-                    if (local.get('userName') !== null) {
-                        $('#userName').val(local.get('userName'));
-                    } else {
-                        $('#userName').val(session.get('userName'));
+                    if (session.get('userPassword') !== null || local.get('userPassword') !== null) {
+                        if (local.get('userPassword') !== null) {
+                            $('#userPassword').val(local.get('userPassword'));
+                        } else {
+                            $('#userPassword').val(session.get('userPassword'));
+                        }
+                    }
+
+                    if (($('#userName').val() !== '') && $('userPassword').val() !== '') {
+                        $('#loginBtn').click();
                     }
                 }
-
-                if (session.get('userPassword') !== null || local.get('userPassword') !== null) {
-                    if (local.get('userPassword') !== null) {
-                        $('#userPassword').val(local.get('userPassword'));
-                    } else {
-                        $('#userPassword').val(session.get('userPassword'));
-                    }
-                }
-
-
-
-
             });
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -278,6 +278,7 @@
                                     if ($('#rememberUser').val() === 'true') {
                                         local.set('userName', response.userName);
                                         local.set('userPassword', response.userPassword);
+                                        local.set('status', response.status);
                                     }
                                     session.set('status', response.status);
                                     session.set('userName', response.userName);
@@ -303,24 +304,6 @@
                     }
                 }
 
-                function register(obj, url) {
-                    $.ajax({
-                        method: 'POST',
-                        url: url,
-                        data: obj,
-                        success: function (data) {
-                            let response = JSON.parse(data);
-                            $('#status').fadeTo(1500, 1);
-                            $('#status').text(response).fadeTo(1500, 0);
-                        },
-                        error: function (textStatus) {
-                            $('#status').text(textStatus);
-                        }
-                    });
-                }
-
-
-
                 function search() {
                     let html = $('#searchBtn').html();
                     $('#searchBtn').html('<span></span>');
@@ -335,25 +318,17 @@
                             $('#searchBtn').html(html);
                             let recipes = data.hits;
                             for (let i = 0; i < recipes.length; i++) {
-                                document.getElementById('recipes').innerHTML += `<div class='col-sm-10 m-sm-5 p-sm-5 shadow-lg text-center'><h1>${recipes[i].recipe.label}</h1>
-                            <img src='${recipes[i].recipe.image}'><br><button class='btn btn-primary m-sm-2'><a href="${recipes[i].recipe.url}" class='text-white text-decoration-none'>Recipe</a></button>
-                            <button type='button' class='btn btn-primary' onclick="bookMark('${recipes[i]}')">Bookmark</button><div class='row justify-content-around ml-sm-5'><div class='col-sm-5 text-left'>
-                            <h4>Ingredients</h4><ul>${recipes[i].recipe.ingredientLines.map((currentVal) => '<li>' + currentVal + '</li>').join("")}</ul></div>
-                            <div class='col-sm-5 text-left'><h4>Health Information</h4><ul>${recipes[i].recipe.healthLabels.map((currentVal) => '<li>' + currentVal + '</li>').join("")}</ul></div></div>`;
+                                document.getElementById('recipes').innerHTML += `<div class='col-sm-8 m-sm-3 p-sm-5 shadow-lg text-center justify-content-center'><h1>${recipes[i].recipe.label}</h1>
+                                <img src='${recipes[i].recipe.image}'><br><button type='button' id='recipeBtn${i}' class='btn btn-primary m-sm-2'><a href="${recipes[i].recipe.url}" class='text-white text-decoration-none'>Recipe</a></button>
+                                <button type='button' id='bookmarkBtn${i}' class='btn btn-primary'>Bookmark</button><div class='row justify-content-around ml-sm-3'><div class='col-sm-5 text-left justify-content-center'>
+                                <h4>Ingredients</h4><ul>${recipes[i].recipe.ingredientLines.map((currentVal) => '<li>' + currentVal + '</li>').join("")}</ul></div>
+                                <div class='col-sm-5 text-left'><h4>Health Information</h4><ul>${recipes[i].recipe.healthLabels.map((currentVal) => '<li>' + currentVal + '</li>').join("")}</ul></div></div></div>`;
                             }
                         },
                         error: function (errorThrown) {
                             console.log(errorThrown);
                         }
                     });
-                }
-
-                function bookMark(item) {
-                    if (session.get('status') === true || local.get('status') === true) {
-                        bookmarks.push(item);
-                        session.set('bookmarks', bookmarks);
-                        local.set('bookmarks', bookmarks);
-                    }
                 }
 
 
@@ -378,14 +353,6 @@
                         userPassword: $('#userPassword').val()
                     };
                     login(user, 'login.php');
-                });
-
-                $('#registerBtn').bind('click', function () {
-                    let user = {
-                        userName: $('#userName').val(),
-                        userPassword: $('#userPassword').val()
-                    };
-                    register(user, 'register.php');
                 });
 
                 $('#rememberUser').bind('click', function () {
